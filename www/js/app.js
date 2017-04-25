@@ -3,9 +3,9 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic'])
+var starter = angular.module('starter', ['ionic'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $ionicLoading) {
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -20,5 +20,19 @@ angular.module('starter', ['ionic'])
     if(window.StatusBar) {
       StatusBar.styleDefault();
     }
+
+    if(window.ConnectSDK) {
+      $ionicLoading.show({ template: 'Starting Discovery Manager', noBackdrop: true, duration: 1000 });
+      window.ConnectSDK.discoveryManager.startDiscovery();
+      $ionicLoading.show({ template: 'Discovery Started!', noBackdrop: true, duration: 1000 });
+    }
   });
-})
+});
+
+starter.controller('mainCtrl', function($scope, $ionicLoading) {
+
+  $scope.showDevicePicker = function () {
+    $ionicLoading.show({ template: 'Starting Device Picker', noBackdrop: true, duration: 1000 });
+    window.ConnectSDK.discoveryManager.pickDevice();
+  }
+});
