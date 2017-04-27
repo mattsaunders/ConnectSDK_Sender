@@ -40,7 +40,19 @@
         <h1 class="title">Ionic Blank Starter</h1>
       </ion-header-bar>
       <ion-content>
-        <button class="button button-full" ng-click="showDevicePicker()">Select a TV</button>
+        <button class="button button-full" ng-click="showDevicePicker()">Connect to Device</button>
+        <br>
+        <button class="button button-full" ng-click="updateList()">Update List</button>
+        <ul>
+          <li>Device List:</li>
+          <li ng-repeat="device in deviceList" >
+            Name: {{device.getFriendlyName()}} <br> {{device.getCapabilities()}}</li>
+          <br>
+          <li>Chosen Device: </li>
+            {{chosenDevice.getFriendlyName()}} {{chosen.Device.getModelName()}} <br>
+          {{chosenDevice.getCapabilities()}}
+        </ul>
+
       </ion-content>
     </ion-pane>
   </body>

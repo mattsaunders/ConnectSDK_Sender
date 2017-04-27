@@ -21,18 +21,67 @@ var starter = angular.module('starter', ['ionic'])
       StatusBar.styleDefault();
     }
 
-    if(window.ConnectSDK) {
-      $ionicLoading.show({ template: 'Starting Discovery Manager', noBackdrop: true, duration: 1000 });
       window.ConnectSDK.discoveryManager.startDiscovery();
       $ionicLoading.show({ template: 'Discovery Started!', noBackdrop: true, duration: 1000 });
-    }
+
   });
 });
 
 starter.controller('mainCtrl', function($scope, $ionicLoading) {
 
+  $scope.updateList = function() {
+    $scope.deviceList = window.ConnectSDK.discoveryManager.getDeviceList();
+
+  }
+
   $scope.showDevicePicker = function () {
     $ionicLoading.show({ template: 'Starting Device Picker', noBackdrop: true, duration: 1000 });
-    window.ConnectSDK.discoveryManager.pickDevice();
+    var devicePicker = window.ConnectSDK.discoveryManager.pickDevice();
+    devicePicker.success(function (device) {
+      $scope.chosenDevice = device;
+
+      if (device.isReady()) { // already connected
+        launchApp();
+      } else {
+        device.on("ready", launchApp);
+        device.connect();
+      }
+
+      function launchApp (device) {
+
+        var mySession = null;
+        var webAppId = {objectId: "9605425F"};
+        args = {};
+
+        var subscriber = {};
+        var responseWrapper = {};
+
+        //*** Nothing below this works***
+
+        if(device.hasService(window.ConnectSDK.Services.Chromecast) == false) {
+          $ionicLoading.show({ template: 'has chromecast service', noBackdrop: true, duration: 1000 });
+        }
+
+        device._sendCommand("launcher", 'launchYouTube', args, subscriber, responseWrapper);
+
+        //$ionicLoading.show({ template: 'Launched app', noBackdrop: true, duration: 1000 });
+
+        //device._sendCommand();
+
+        device.getModelName();
+        if(device.getService(window.ConnectSDK.Services.Chromecast) != null) {
+          $ionicLoading.show({ template: 'Chromecast Services!', noBackdrop: true, duration: 1000 });
+        }
+
+          device.Launcher.YouTube().success(function (session) {
+          mySession = session;
+          console.log("web app launch success");
+
+        }).error(function (err) {
+          console.log("web app launch error: " + err.message);
+        });
+      }
+
+    });
   }
 });
